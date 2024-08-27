@@ -1,11 +1,24 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/display-name */
 
+import { samepleChats } from "../constants/sampleData";
 import Title from "../shared/Title";
+import { useNavigate, useParams } from "react-router-dom";
+import ChatList from "../specific/ChatList";
 import Header from "./Header";
 import { Grid } from "@mui/material"
+import Profile from "../specific/Profile";
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
+        const params = useParams();
+        const navigate = useNavigate();
+
+        const chatId = params.chatId;
+
+        const handleDeleteChat = (e, chatId, groupChat) => {
+
+        }
         return (
             <>
                 <Title />
@@ -20,7 +33,17 @@ const AppLayout = () => (WrappedComponent) => {
                         }}
                         height={"100%"}
                     >
-                        First
+                        <ChatList 
+                        chats={samepleChats} 
+                        chatId={chatId}
+                        newMessagesAlert={[
+                            {
+                                chatId,
+                                count: 4
+                            }
+                        ]}
+                            handleDeleteChat={handleDeleteChat}
+                        />
                     </Grid>
                     <Grid item xs={12} sm={8} md={5} lg={6} height={"100%"}>
                         <WrappedComponent {...props} />
@@ -36,7 +59,7 @@ const AppLayout = () => (WrappedComponent) => {
                             bgcolor: "rgba(0,0,0,0.85)",
                         }}
                     >
-                        First
+                        <Profile/>
                     </Grid>
                 </Grid>
                 <div>Footer</div>
