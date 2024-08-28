@@ -4,6 +4,7 @@ import { CameraAlt } from '@mui/icons-material'
 import { VisuallyHiddenInput } from "../components/styles/StyledComponents";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp"
 import { usernameValidator } from "../utils/validators";
+import { bgGradient } from "../components/constants/color";
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
     const toggleLogin = () => setIsLogin(!isLogin);
@@ -24,35 +25,44 @@ const Login = () => {
     }
 
     return (
-        <div style={{
-            backgroundImage: "liner-gradient(rgba(255 255 209), rgba(249 159 159))",
-        }}>
-            <Container component={"main"} maxWidth="xs" sx={{
-                height: "100vh",
-                display: 'flex',
-                alignItems: 'center', justifyContent: 'center'
-            }}>
-                <Paper elevation={3}
+        <div
+            style={{
+                backgroundImage: bgGradient,
+            }}
+        >
+            <Container
+                component={"main"}
+                maxWidth="xs"
+                sx={{
+                    height: "100vh",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Paper
+                    elevation={3}
                     sx={{
                         padding: 4,
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center"
+                        alignItems: "center",
                     }}
                 >
                     {isLogin ?
                         <>
                             <Typography variant="h5">Login</Typography>
-                            <form style={{
-                                width: '100%',
-                                marginTop: '1rem'
-                            }}
+                            <form
+                                style={{
+                                    width: "100%",
+                                    marginTop: "1rem",
+                                }}
                                 onSubmit={handleLogin}
                             >
                                 <TextField
                                     required
                                     fullWidth
-                                    label="username"
+                                    label="Username"
                                     margin="normal"
                                     variant="outlined"
                                     value={username.value}
@@ -61,7 +71,7 @@ const Login = () => {
                                 <TextField
                                     required
                                     fullWidth
-                                    label="password"
+                                    label="Password"
                                     type="password"
                                     margin="normal"
                                     variant="outlined"
@@ -70,21 +80,26 @@ const Login = () => {
                                 />
                                 <Button
                                     sx={{
-                                        marginTop: "1rem"
+                                        marginTop: "1rem",
                                     }}
                                     variant="contained"
                                     color="primary"
                                     type="submit"
                                     fullWidth
-                                >Login</Button>
+                                    // disabled={isLoading}
+                                >
+                                    Login
+                                </Button>
                                 <Typography textAlign={"center"} m={"1rem"}>
-                                    Or
+                                    OR
                                 </Typography>
                                 <Button
+                                    // disabled={isLoading}
                                     fullWidth
                                     variant="text"
-                                    onClick={toggleLogin}>
-                                    Sign In
+                                    onClick={toggleLogin}
+                                >
+                                    Sign Up Instead
                                 </Button>
                             </form>
                         </>
@@ -93,21 +108,19 @@ const Login = () => {
                             <Typography variant="h5">
                                 Sign Up
                             </Typography>
-                            <form style={{
-                                width: '100%',
-                                marginTop: '1rem'
-
-                            }}
+                            <form
+                                style={{
+                                    width: "100%",
+                                    marginTop: "1rem",
+                                }}
                                 onSubmit={handleSignUp}
                             >
-                                <Stack
-                                    position={"relative"} width={'10rem'}
-                                    margin={'auto'}>
+                                <Stack position={"relative"} width={"10rem"} margin={"auto"}>
                                     <Avatar
                                         sx={{
-                                            width: '10rem',
-                                            height: '10rem',
-                                            objectFit: "contain"
+                                            width: "10rem",
+                                            height: "10rem",
+                                            objectFit: "contain",
                                         }}
                                         src={avatar.preview}
                                     />
@@ -115,14 +128,13 @@ const Login = () => {
                                     <IconButton
                                         sx={{
                                             position: "absolute",
-                                            bottom: '0',
+                                            bottom: "0",
                                             right: "0",
                                             color: "white",
                                             bgcolor: "rgba(0,0,0,0.5)",
                                             ":hover": {
-                                                bgcolor: "rgba(0,0,0,0.7)"
-                                            }
-
+                                                bgcolor: "rgba(0,0,0,0.7)",
+                                            },
                                         }}
                                         component="label"
                                     >
