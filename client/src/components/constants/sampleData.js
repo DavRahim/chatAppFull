@@ -52,7 +52,7 @@ export const sampleMessage = [
         content: "L*uda ka Message hai",
         _id: "sfnsdjkfsdnfkjsbnd",
         sender: {
-            _id: "user._id",
+            _id: "dfgdsasddf",
             name: "Chaman ",
         },
         chat: "chatId",

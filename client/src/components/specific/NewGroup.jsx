@@ -2,19 +2,30 @@ import { useInputValidation } from "6pp";
 import { Button, Dialog, DialogTitle, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import UserItem from "../shared/UserItem";
 import { sampleUsers } from "../constants/sampleData";
+import { useState } from "react";
 
 const NewGroup = () => {
     let isLoading = false
     const groupName = useInputValidation("");
-    const selectMemberHandler = () => {
 
+    const [members, setMembers] = useState(sampleUsers);
+    const [selectedMembers, SetSelectedMember] = useState([]);
+
+
+    const selectMemberHandler = (id) => {
+        SetSelectedMember(prev => (prev.includes(id) ? prev.filter((currElement) => currElement !== id) : [...prev, id]));
     }
+    console.log(selectedMembers);
+    
     const submitHandler = () => {
 
     }
+    const closeHandler = () => {
+            
+    }
     return (
         <Dialog
-            // onClose={closeHandler}
+            onClose={closeHandler}
             // open={isNewGroup}
             open
         >
@@ -35,12 +46,12 @@ const NewGroup = () => {
                     {isLoading ? (
                         <Skeleton />
                     ) : (
-                        sampleUsers.map((i) => (
+                        members.map((i) => (
                             <UserItem
                                 user={i}
                                 key={i._id}
                                 handler={selectMemberHandler}
-                                // isAdded={selectedMembers.includes(i._id)}
+                                isAdded={selectedMembers.includes(i._id)}
                             />
                         ))
                     )}
@@ -51,7 +62,7 @@ const NewGroup = () => {
                         variant="text"
                         color="error"
                         size="large"
-                        // onClick={closeHandler}
+                    // onClick={closeHandler}
                     >
                         Cancel
                     </Button>
@@ -59,7 +70,7 @@ const NewGroup = () => {
                         variant="contained"
                         size="large"
                         onClick={submitHandler}
-                        // disabled={isLoadingNewGroup}
+                    // disabled={isLoadingNewGroup}
                     >
                         Create
                     </Button>
