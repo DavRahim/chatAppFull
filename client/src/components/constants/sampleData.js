@@ -42,6 +42,11 @@ export const sampleUsers = [
         name: "John Boi",
         _id: "2",
     },
+    {
+        avatar: "https://www.w3schools.com/howto/img_avatar.png",
+        name: "Abul malek",
+        _id: "3",
+    },
 ];
 
 export const sampleNotifications = [
