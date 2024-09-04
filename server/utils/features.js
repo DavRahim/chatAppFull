@@ -33,6 +33,10 @@ const sendToken = (res, user, code, message) => {
     });
 };
 
+const emitEvent = (req, event, users, data) => {
+    console.log("request");
+}
+
 const uploadFilesToCloudinary = async (files = []) => {
     const uploadPromises = files.map((file) => {
         return new Promise((resolve, reject) => {
@@ -66,5 +70,7 @@ const uploadFilesToCloudinary = async (files = []) => {
 export {
     connectDB,
     sendToken,
-    uploadFilesToCloudinary
+    uploadFilesToCloudinary,
+    cookieOptions,
+    emitEvent
 };

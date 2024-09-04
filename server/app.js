@@ -6,10 +6,11 @@ import cors from "cors"
 import { v2 as cloudinary } from "cloudinary";
 
 
-import userRoute from "./routes/user.js";
 import { connectDB } from "./utils/features.js";
 import { corsOptions } from "./constants/config.js";
 
+import userRoute from "./routes/user.js";
+import chatRoute from "./routes/chat.js";
 
 dotenv.config({
     path: "./.env",
@@ -39,7 +40,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 app.use("/api/v1/user", userRoute);
-
+app.use("/api/v1/chat", chatRoute);
 
 app.get("/test", (req, res) => {
     res.send("Api WOrk Done")
