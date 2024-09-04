@@ -9,18 +9,22 @@ import { ErrorHandler } from "../utils/utility.js";
 
 // Create a new user and save it to the database and save token in cookie
 const newUser = TryCatch(async (req, res, next) => {
-    const { name, username, password, bio } = req.body;
+  const { name, username, password, bio } = req.body;
 
-    const file = req.file;
-  console.log(file, "file");
+  //   const file = req.file;
+  // console.log(file, "file");
 
-    if (!file) return next(new ErrorHandler("Please Upload Avatar"));
+  //   if (!file) return next(new ErrorHandler("Please Upload Avatar"));
 
-  const result = await uploadFilesToCloudinary([file]);
+  // const result = await uploadFilesToCloudinary([file]);
 
+  // const avatar = {
+  //   public_id: result[0].public_id,
+  //   url: result[0].url,
+  // };
   const avatar = {
-    public_id: result[0].public_id,
-    url: result[0].url,
+    public_id: "image.png",
+    url: "image.png",
   };
 
   const user = await User.create({
@@ -32,13 +36,14 @@ const newUser = TryCatch(async (req, res, next) => {
   });
 
   sendToken(res, user, 201, "User created");
-    
+
 })
 
 
 // Login user and save token in cookie
 const login = TryCatch(async (req, res, next) => {
   const { username, password } = req.body;
+  console.log(username, password, "password");
 
   const user = await User.findOne({ username }).select("+password");
 
@@ -64,7 +69,15 @@ const getMyProfile = TryCatch(async (req, res, next) => {
   });
 });
 
+const logout = TryCatch(async (req, res) => {
+  return res
+    .status(200)
+    .cookie("chattu-token", "", { ...cookieOptions, maxAge: 0 })
+    .json({
+      success: true,
+      message: "Logged out successfully",
+    });
+});
 
 
-
-export { login, newUser, getMyProfile }
+export { login, newUser, getMyProfile, logout }
