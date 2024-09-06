@@ -1,7 +1,7 @@
-import { ALERT, REFETCH_CHATS } from "../constants/events";
-import { TryCatch } from "../middlewares/error";
-import { Chat } from "../models/chat";
-import { emitEvent } from "../utils/features";
+import { ALERT, REFETCH_CHATS } from "../constants/events.js";
+import { TryCatch } from "../middlewares/error.js";
+import { Chat } from "../models/chat.js";
+import { emitEvent } from "../utils/features.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
     const { name, members } = req.body;

@@ -11,6 +11,7 @@ import { corsOptions } from "./constants/config.js";
 
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
+import { createUser } from "./seeders/user.js";
 
 dotenv.config({
     path: "./.env",
@@ -22,6 +23,7 @@ const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
 
 
 connectDB(mongoURI);
+
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
