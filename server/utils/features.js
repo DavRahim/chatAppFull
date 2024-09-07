@@ -67,10 +67,16 @@ const uploadFilesToCloudinary = async (files = []) => {
     }
 };
 
+
+const deletFilesFromCloudinary = async (public_ids) => {
+    // Delete files from cloudinary
+};
+
 export {
     connectDB,
     sendToken,
     uploadFilesToCloudinary,
     cookieOptions,
-    emitEvent
+    emitEvent,
+    deletFilesFromCloudinary
 };
