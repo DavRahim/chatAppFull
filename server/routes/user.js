@@ -9,8 +9,8 @@ const app = express.Router();
 
 app.post("/new",
     singleAvatar,
-     registerValidator(), 
-     validateHandler, 
+    registerValidator(),
+    validateHandler,
     newUser
 );
 
