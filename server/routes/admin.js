@@ -16,8 +16,8 @@ app.use(adminOnly);
 app.get("/", getAdminData);
 
 app.get("/users", allUsers);
-app.get("/chats", allChats);
-app.get("/messages", allMessages);
+// app.get("/chats", allChats);
+// app.get("/messages", allMessages);
 
-app.get("/stats", getDashboardStats);
+// app.get("/stats", getDashboardStats);
 export default app;
