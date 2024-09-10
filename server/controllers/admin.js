@@ -4,6 +4,7 @@ import { ErrorHandler } from "../utils/utility.js";
 import { User } from "../models/user.js";
 import { Chat } from "../models/chat.js";
 import { Message } from "../models/message.js";
+import { cookieOptions } from "../utils/features.js";
 
 const adminLogin = TryCatch(async (req, res, next) => {
     const { secretKey } = req.body;
@@ -26,6 +27,24 @@ const adminLogin = TryCatch(async (req, res, next) => {
         });
 });
 
+const adminLogout = TryCatch(async (req, res, next) => {
+    return res
+        .status(200)
+        .cookie("chattu-admin-token", "", {
+            ...cookieOptions,
+            maxAge: 0,
+        })
+        .json({
+            success: true,
+            message: "Logged Out Successfully",
+        });
+});
+
+const getAdminData = TryCatch(async (req, res, next) => {
+    return res.status(200).json({
+        admin: true,
+    });
+});
 
 const allUsers = TryCatch(async (req, res) => {
     const users = await User.find({});
@@ -116,9 +135,60 @@ const allMessages = TryCatch(async (req, res) => {
     });
 });
 
+
+const getDashboardStats = TryCatch(async (req, res) => {
+    const [groupsCount, usersCount, messagesCount, totalChatsCount] =
+        await Promise.all([
+            Chat.countDocuments({ groupChat: true }),
+            User.countDocuments(),
+            Message.countDocuments(),
+            Chat.countDocuments(),
+        ]);
+
+    const today = new Date();
+
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    const last7DaysMessages = await Message.find({
+        createdAt: {
+            $gte: last7Days,
+            $lte: today,
+        },
+    }).select("createdAt");
+
+    const messages = new Array(7).fill(0);
+    const dayInMiliseconds = 1000 * 60 * 60 * 24;
+
+    last7DaysMessages.forEach((message) => {
+        const indexApprox =
+            (today.getTime() - message.createdAt.getTime()) / dayInMiliseconds;
+        const index = Math.floor(indexApprox);
+
+        messages[6 - index]++;
+    });
+
+    const stats = {
+        groupsCount,
+        usersCount,
+        messagesCount,
+        totalChatsCount,
+        messagesChart: messages,
+    };
+
+    return res.status(200).json({
+        success: true,
+        stats,
+    });
+});
+
+
 export {
     adminLogin,
+    adminLogout,
     allUsers,
     allChats,
-    allMessages
+    allMessages,
+    getDashboardStats,
+    getAdminData
 };
