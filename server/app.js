@@ -13,6 +13,9 @@ import { corsOptions } from "./constants/config.js";
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
+import { getSockets } from "./lib/helper.js";
+import { Message } from "./models/message.js";
 
 dotenv.config({
     path: "./.env",
@@ -21,6 +24,9 @@ dotenv.config({
 const mongoURI = process.env.MONGO_URI;
 const port = process.env.PORT || 3000;
 const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
+const adminSecretKey = process.env.ADMIN_SECRET_KEY || "adsasdsdfsdfsdfd";
+const userSocketIDs = new Map();
+const onlineUsers = new Set();
 
 
 connectDB(mongoURI);
@@ -66,9 +72,45 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
 
     console.log("A User connected", socket.id);
+    const user = socket.user;
+    userSocketIDs.set(user._id.toString(), socket.id);
+
+
+    socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
+        const messageForRealTime = {
+            content: message,
+            _id: uuid(),
+            sender: {
+                _id: user._id,
+                name: user.name,
+            },
+            chat: chatId,
+            createdAt: new Date().toISOString(),
+        };
+        const messageForDB = {
+            content: message,
+            sender: user._id,
+            chat: chatId,
+        };
+
+        const membersSocket = getSockets(members);
+        io.to(membersSocket).emit(NEW_MESSAGE, {
+            chatId,
+            message: messageForRealTime,
+        });
+        io.to(membersSocket).emit(NEW_MESSAGE_ALERT, { chatId });
+
+        try {
+            await Message.create(messageForDB);
+        } catch (error) {
+            throw new Error(error);
+        }
+
+    })
 
     socket.on("disconnect", () => {
         console.log("user disconnect");
+        userSocketIDs.delete(user._id.toString());
     })
 })
 
