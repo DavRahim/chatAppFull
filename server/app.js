@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
+import { Server } from "socket.io";
 import cors from "cors"
 import { v2 as cloudinary } from "cloudinary";
 
@@ -34,7 +35,11 @@ cloudinary.config({
 
 const app = express();
 const server = createServer(app);
+const io = new Server(server, {
+    cors: corsOptions,
+});
 
+app.set("io", io);
 
 // Using Middlewares Here
 app.use(express.json());
@@ -50,10 +55,27 @@ app.get("/test", (req, res) => {
 })
 
 
+io.use((socket, next) => {
+    cookieParser()(
+        socket.request,
+        socket.request.res,
+        async (err) => await socketAuthenticator(err, socket, next)
+    );
+});
+
+io.on("connection", (socket) => {
+
+    console.log("A User connected", socket.id);
+
+    socket.on("disconnect", () => {
+        console.log("user disconnect");
+    })
+})
+
 server.listen(port, () => {
     console.log(`Server is running on port ${port} in ${envMode} Mode`);
 });
 
 
 
-export { envMode };
+export { envMode }; 
