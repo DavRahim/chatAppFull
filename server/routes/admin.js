@@ -1,5 +1,13 @@
 import express from "express"
-import { adminLogin, adminLogout, allChats, allMessages, allUsers, getAdminData, getDashboardStats } from "../controllers/admin.js";
+import {
+    adminLogin,
+    adminLogout,
+    allChats,
+    allMessages,
+    allUsers,
+    getAdminData,
+    getDashboardStats
+} from "../controllers/admin.js";
 import { adminLoginValidator, validateHandler } from "../lib/validators.js";
 import { adminOnly } from "../middlewares/auth.js";
 
