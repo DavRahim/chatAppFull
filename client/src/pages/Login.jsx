@@ -1,12 +1,19 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { Avatar, Button, Container, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
 import { CameraAlt } from '@mui/icons-material'
 import { VisuallyHiddenInput } from "../components/styles/StyledComponents";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp"
 import { usernameValidator } from "../utils/validators";
 import { bgGradient } from "../components/constants/color";
+import axios from "axios";
+import { server } from "../constants/config";
+import { useDispatch } from "react-redux";
+import { userExists } from "../redux/reducers/auth";
 const Login = () => {
+  
     const [isLogin, setIsLogin] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const toggleLogin = () => setIsLogin(!isLogin);
 
     const name = useInputValidation("");
@@ -16,11 +23,45 @@ const Login = () => {
 
     const avatar = useFileHandler("single");
 
+    const dispatch = useDispatch();
+
     const handleSignUp = (e) => {
         e.preventDefault();
     };
-    const handleLogin = (e) => {
+
+    const config = {
+        withCredentials: true,
+        headers: {
+            "Content-Type": "application/json",
+        },
+    };
+    
+    const handleLogin = async (e) => {
         e.preventDefault();
+        const toastId = toast.loading("Logging In...");
+
+        setIsLoading(true);
+
+        try {
+            const { data } = await axios.post(
+                `${server}/api/v1/user/login`,
+                {
+                    username: username.value,
+                    password: password.value,
+                },
+                config
+            );
+            dispatch(userExists(data.user));
+            toast.success(data.message, {
+                id: toastId,
+            });
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Something Went Wrong", {
+                id: toastId,
+            });
+        } finally {
+            setIsLoading(false);
+        }
 
     }
 
@@ -86,7 +127,7 @@ const Login = () => {
                                     color="primary"
                                     type="submit"
                                     fullWidth
-                                    // disabled={isLoading}
+                                // disabled={isLoading}
                                 >
                                     Login
                                 </Button>

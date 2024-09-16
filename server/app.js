@@ -119,4 +119,4 @@ server.listen(port, () => {
 
 
 
-export { envMode }; 
+export { envMode, adminSecretKey, userSocketIDs }; 
