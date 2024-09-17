@@ -87,7 +87,7 @@ const Login = () => {
                 formData,
                 config
             );
-
+            console.log(data);
             dispatch(userExists(data.user));
             toast.success(data.message, {
                 id: toastId,
@@ -100,7 +100,7 @@ const Login = () => {
             setIsLoading(false);
         }
     };
-    
+
     return (
         <div
             style={{
