@@ -25,10 +25,6 @@ const Login = () => {
 
     const dispatch = useDispatch();
 
-    const handleSignUp = (e) => {
-        e.preventDefault();
-    };
-
     const config = {
         withCredentials: true,
         headers: {
@@ -65,6 +61,46 @@ const Login = () => {
 
     }
 
+    const handleSignUp = async (e) => {
+        e.preventDefault();
+
+        const toastId = toast.loading("Signing Up...");
+        setIsLoading(true);
+
+        const formData = new FormData();
+        formData.append("avatar", avatar.file);
+        formData.append("name", name.value);
+        formData.append("bio", bio.value);
+        formData.append("username", username.value);
+        formData.append("password", password.value);
+
+        const config = {
+            withCredentials: true,
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        };
+
+        try {
+            const { data } = await axios.post(
+                `${server}/api/v1/user/new`,
+                formData,
+                config
+            );
+
+            dispatch(userExists(data.user));
+            toast.success(data.message, {
+                id: toastId,
+            });
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Something Went Wrong", {
+                id: toastId,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
     return (
         <div
             style={{
