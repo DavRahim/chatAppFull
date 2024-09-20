@@ -16,6 +16,7 @@ import adminRoute from "./routes/admin.js";
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
+import { socketAuthenticator } from "./middlewares/auth.js";
 
 dotenv.config({
     path: "./.env",
@@ -73,7 +74,6 @@ io.on("connection", (socket) => {
 
     const user = socket.user;
     userSocketIDs.set(user._id.toString(), socket.id);
-
 
     socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
         const messageForRealTime = {

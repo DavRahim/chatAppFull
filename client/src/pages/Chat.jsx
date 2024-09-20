@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { IconButton, Skeleton, Stack } from "@mui/material";
 import AppLayout from "../components/layout/AppLayout";
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, useState } from "react";
 import {
   AttachFile as AttachFileIcon,
   Send as SendIcon,
@@ -11,6 +11,7 @@ import { grayColor, orange } from "../components/constants/color";
 import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
 import { sampleMessage } from "../components/constants/sampleData";
+import { GetSocket } from "../socket";
 
 const user= {
   avatar: "https://www.w3schools.com/howto/img_avatar.png",
@@ -19,14 +20,38 @@ const user= {
 }
 
 const Chat = () => {
+  const socket = GetSocket();
 
   const containerRef = useRef(null)
   const bottomRef = useRef(null);
 
 
+
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
+
+  const [IamTyping, setIamTyping] = useState(false);
+  const [userTyping, setUserTyping] = useState(false);
+  const typingTimeout = useRef(null);
+
+
   let isLoading = false
 
-  const submitHandler = () => {
+  const messageOnChange = (e) => {
+    setMessage(e.target.value);
+  }
+
+  const submitHandler = (e) => {
+
+    e.preventDefault();
+    
+    if (!message.trim()) return;
+
+    // Emitting the message to the server
+    socket.emit(NEW_MESSAGE, { chatId, members, message });
+    setMessage("");
 
   }
   return isLoading ? (
@@ -80,8 +105,8 @@ const Chat = () => {
 
           <InputBox
             placeholder="Type Message Here..."
-            // value={message}
-            // onChange={messageOnChange}
+            value={message}
+            onChange={messageOnChange}
           />
 
           <IconButton

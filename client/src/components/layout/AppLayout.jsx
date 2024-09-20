@@ -10,12 +10,16 @@ import { useMyChatsQuery } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsMobile } from "../../redux/reducers/misc";
 import { useErrors } from "../../hooks/hook";
+import { GetSocket } from "../../socket";
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
         const params = useParams();
         const navigate = useNavigate();
         const dispatch = useDispatch();
+        const socket = GetSocket();
+
+        console.log(socket, "socket");
 
         const chatId = params.chatId;
         const { isMobile } = useSelector((state) => state.misc);
