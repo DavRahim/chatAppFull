@@ -1,21 +1,32 @@
 /* eslint-disable react/display-name */
 import { Avatar, Button, Dialog, DialogTitle, ListItem, Skeleton, Stack, Typography } from "@mui/material";
 import { memo } from "react";
-import { sampleNotifications } from "../constants/sampleData";
+import { useAcceptFriendRequestMutation, useGetNotificationsQuery } from "../../redux/api/api";
+import { useDispatch, useSelector } from "react-redux";
+import { useAsyncMutation, useErrors } from "../../hooks/hook";
+import { setIsNotification } from "../../redux/reducers/misc";
 
 const Notifications = () => {
+    const { isNotification } = useSelector((state) => state.misc);
 
-    let isLoading = false;
+    const dispatch = useDispatch();
 
-    const friendRequestHandler = (_id, accpect) => {
-        console.log(_id, accpect);
-    }
+    const { isLoading, data, error, isError } = useGetNotificationsQuery();
+
+    const [acceptRequest] = useAsyncMutation(useAcceptFriendRequestMutation);
+
+    const friendRequestHandler = async ({ _id, accept }) => {
+        dispatch(setIsNotification(false));
+        await acceptRequest("Accepting...", { requestId: _id, accept });
+    };
+
+    const closeHandler = () => dispatch(setIsNotification(false));
+    useErrors([{ error, isError }]);
 
     return (
         <Dialog
-            // open={isNotification} 
-            // onClose={closeHandler}
-            open
+            open={isNotification}
+            onClose={closeHandler}
         >
             <Stack p={{ xs: "1rem", sm: "2rem" }} maxWidth={"25rem"}>
                 <DialogTitle>Notifications</DialogTitle>
@@ -24,8 +35,8 @@ const Notifications = () => {
                     <Skeleton />
                 ) : (
                     <>
-                        {sampleNotifications.length > 0 ? (
-                            sampleNotifications?.map(({ sender, _id }) => (
+                        {data?.allRequests.length > 0 ? (
+                            data?.allRequests?.map(({ sender, _id }) => (
                                 <NotificationItem
                                     sender={sender}
                                     _id={_id}
