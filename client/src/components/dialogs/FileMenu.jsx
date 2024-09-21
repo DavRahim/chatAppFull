@@ -7,18 +7,25 @@ import {
     UploadFile as UploadFileIcon,
     VideoFile as VideoFileIcon,
 } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsFileMenu } from "../../redux/reducers/misc";
 
 const FileMenu = ({ anchorE1, chatId }) => {
+
+    const { isFileMenu } = useSelector((state) => state.misc);
+    const dispatch = useDispatch();
+
     const imageRef = useRef(null);
     const audioRef = useRef(null);
     const videoRef = useRef(null);
     const fileRef = useRef(null);
+
+    const closeFileMenu = () => dispatch(setIsFileMenu(false));
     return (
         <Menu 
         anchorEl={anchorE1} 
-        // open={isFileMenu} 
-        // onClose={closeFileMenu}
-        open={false}
+        open={isFileMenu} 
+        onClose={closeFileMenu}
         >
             <div
                 style={{

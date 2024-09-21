@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { IconButton, Skeleton, Stack } from "@mui/material";
 import AppLayout from "../components/layout/AppLayout";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   AttachFile as AttachFileIcon,
   Send as SendIcon,
@@ -12,16 +12,22 @@ import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
 import { sampleMessage } from "../components/constants/sampleData";
 import { GetSocket } from "../socket";
+import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../components/constants/events";
+import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
+import { useErrors, useSocketEvents } from "../hooks/hook";
+import { useInfiniteScrollTop } from "6pp";
+import { useDispatch } from "react-redux";
+import { setIsFileMenu } from "../redux/reducers/misc";
 
-const user= {
+const user = {
   avatar: "https://www.w3schools.com/howto/img_avatar.png",
   name: "John Doe",
   _id: "dfgdsasddf",
 }
 
-const Chat = () => {
+const Chat = ({ chatId, user }) => {
   const socket = GetSocket();
-
+  const dispatch = useDispatch();
   const containerRef = useRef(null)
   const bottomRef = useRef(null);
 
@@ -36,17 +42,38 @@ const Chat = () => {
   const [userTyping, setUserTyping] = useState(false);
   const typingTimeout = useRef(null);
 
+  const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
 
-  let isLoading = false
+  const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
+
+  const { data: oldMessages, setData: setOldMessages } = useInfiniteScrollTop(
+    containerRef,
+    oldMessagesChunk.data?.totalPages,
+    page,
+    setPage,
+    oldMessagesChunk.data?.messages
+  );
+
+  const errors = [
+    { isError: chatDetails.isError, error: chatDetails.error },
+    { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
+  ];
+
+  const members = chatDetails?.data?.chat?.members;
 
   const messageOnChange = (e) => {
     setMessage(e.target.value);
   }
 
-  const submitHandler = (e) => {
 
+  const handleFileOpen = (e) => {
+    dispatch(setIsFileMenu(true));
+    setFileMenuAnchor(e.currentTarget);
+  };
+
+  const submitHandler = (e) => {
     e.preventDefault();
-    
+
     if (!message.trim()) return;
 
     // Emitting the message to the server
@@ -54,7 +81,43 @@ const Chat = () => {
     setMessage("");
 
   }
-  return isLoading ? (
+
+  // useEffect(() => {
+  //   socket.emit(CHAT_JOINED, { userId: user._id, members });
+  //   // dispatch(removeNewMessagesAlert(chatId));
+
+  //   return () => {
+  //     setMessages([]);
+  //     setMessage("");
+  //     // setOldMessages([]);
+  //     setPage(1);
+  //     socket.emit(CHAT_LEAVED, { userId: user._id, members });
+  //   };
+  // }, [chatId]);
+
+  const newMessagesListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+
+      setMessages((prev) => [...prev, data.message]);
+    },
+    [chatId]
+  );
+
+  const eventHandler = {
+    // [ALERT]: alertListener,
+    [NEW_MESSAGE]: newMessagesListener,
+    // [START_TYPING]: startTypingListener,
+    // [STOP_TYPING]: stopTypingListener,
+  };
+
+  useSocketEvents(socket, eventHandler);
+
+  useErrors(errors);
+
+  const allMessages = [...oldMessages, ...messages];
+
+  return chatDetails.isLoading ? (
     <Skeleton />
   ) : (
     <Fragment>
@@ -70,7 +133,7 @@ const Chat = () => {
           overflowY: "auto",
         }}
       >
-        {sampleMessage.map((i) => (
+        {allMessages.map((i) => (
           <MessageComponent key={i._id} message={i} user={user} />
         ))}
 
@@ -98,7 +161,7 @@ const Chat = () => {
               left: "1.5rem",
               rotate: "30deg",
             }}
-            // onClick={handleFileOpen};
+          onClick={handleFileOpen}
           >
             <AttachFileIcon />
           </IconButton>
@@ -128,9 +191,9 @@ const Chat = () => {
       </form>
 
       <FileMenu
-      //  anchorE1={fileMenuAnchor} 
-      //  chatId={chatId} 
-       />
+       anchorE1={fileMenuAnchor} 
+       chatId={chatId} 
+      />
     </Fragment>
   );
 };
