@@ -230,8 +230,7 @@ const sendAttachments = TryCatch(async (req, res, next) => {
         return next(new ErrorHandler("Please provide attachments", 400));
 
     //   Upload files here
-    // const attachments = await uploadFilesToCloudinary(files);
-    const attachments = []
+    const attachments = await uploadFilesToCloudinary(files);
     console.log(files);
 
     const messageForDB = {
