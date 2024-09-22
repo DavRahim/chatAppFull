@@ -29,6 +29,7 @@ const Header = () => {
   const { isSearch, isNotification } = useSelector(
     (state) => state.misc
   );
+  const { notificationCount } = useSelector((state) => state.chat);
 
   //  const [isSearch, setIsSearch] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
@@ -110,7 +111,7 @@ const Header = () => {
                 title={"Notifications"}
                 icon={<NotificationsIcon />}
                 onClick={openNotification}
-              // value={notificationCount}
+                value={notificationCount}
               />
 
               <IconBtn

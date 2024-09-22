@@ -10,20 +10,20 @@ import { InputBox } from "../components/styles/StyledComponents";
 import { grayColor, orange } from "../components/constants/color";
 import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
-import { sampleMessage } from "../components/constants/sampleData";
 import { GetSocket } from "../socket";
-import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../components/constants/events";
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE } from "../components/constants/events";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useInfiniteScrollTop } from "6pp";
 import { useDispatch } from "react-redux";
 import { setIsFileMenu } from "../redux/reducers/misc";
+import { removeNewMessagesAlert } from "../redux/reducers/chat";
 
-const user = {
-  avatar: "https://www.w3schools.com/howto/img_avatar.png",
-  name: "John Doe",
-  _id: "dfgdsasddf",
-}
+// const user = {
+//   avatar: "https://www.w3schools.com/howto/img_avatar.png",
+//   name: "John Doe",
+//   _id: "dfgdsasddf",
+// }
 
 const Chat = ({ chatId, user }) => {
   const socket = GetSocket();
@@ -38,9 +38,9 @@ const Chat = ({ chatId, user }) => {
   const [page, setPage] = useState(1);
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
 
-  const [IamTyping, setIamTyping] = useState(false);
-  const [userTyping, setUserTyping] = useState(false);
-  const typingTimeout = useRef(null);
+  // const [IamTyping, setIamTyping] = useState(false);
+  // const [userTyping, setUserTyping] = useState(false);
+  // const typingTimeout = useRef(null);
 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
 
@@ -82,18 +82,18 @@ const Chat = ({ chatId, user }) => {
 
   }
 
-  // useEffect(() => {
-  //   socket.emit(CHAT_JOINED, { userId: user._id, members });
-  //   // dispatch(removeNewMessagesAlert(chatId));
+  useEffect(() => {
+    socket.emit(CHAT_JOINED, { userId: user?._id, members });
+    dispatch(removeNewMessagesAlert(chatId));
 
-  //   return () => {
-  //     setMessages([]);
-  //     setMessage("");
-  //     // setOldMessages([]);
-  //     setPage(1);
-  //     socket.emit(CHAT_LEAVED, { userId: user._id, members });
-  //   };
-  // }, [chatId]);
+    return () => {
+      setMessages([]);
+      setMessage("");
+      setOldMessages([]);
+      setPage(1);
+      socket.emit(CHAT_LEAVED, { userId: user?._id, members });
+    };
+  }, [chatId, dispatch, members, setOldMessages, socket, user]);
 
   const newMessagesListener = useCallback(
     (data) => {
@@ -161,7 +161,7 @@ const Chat = ({ chatId, user }) => {
               left: "1.5rem",
               rotate: "30deg",
             }}
-          onClick={handleFileOpen}
+            onClick={handleFileOpen}
           >
             <AttachFileIcon />
           </IconButton>
@@ -191,8 +191,8 @@ const Chat = ({ chatId, user }) => {
       </form>
 
       <FileMenu
-       anchorE1={fileMenuAnchor} 
-       chatId={chatId} 
+        anchorE1={fileMenuAnchor}
+        chatId={chatId}
       />
     </Fragment>
   );
