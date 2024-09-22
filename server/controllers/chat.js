@@ -231,7 +231,6 @@ const sendAttachments = TryCatch(async (req, res, next) => {
 
     //   Upload files here
     const attachments = await uploadFilesToCloudinary(files);
-    console.log(files);
 
     const messageForDB = {
         content: "",

@@ -50,4 +50,4 @@ const getOrSaveFromStorage = ({ key, value, get }) => {
     else localStorage.setItem(key, JSON.stringify(value));
 };
 
-export { fileFormat, transformImage, getLast7Days, getOrSaveFromStorage };
+export { fileFormat, transformImage, getLast7Days, getOrSaveFromStorage }; 
