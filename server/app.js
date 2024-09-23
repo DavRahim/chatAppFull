@@ -14,7 +14,7 @@ import { corsOptions } from "./constants/config.js";
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, ONLINE_USERS, START_TYPING, STOP_TYPING } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { socketAuthenticator } from "./middlewares/auth.js";
@@ -108,9 +108,36 @@ io.on("connection", (socket) => {
 
     })
 
+    socket.on(START_TYPING, ({ members, chatId }) => {
+        const membersSockets = getSockets(members);
+        socket.to(membersSockets).emit(START_TYPING, { chatId });
+    });
+
+    socket.on(STOP_TYPING, ({ members, chatId }) => {
+        const membersSockets = getSockets(members);
+        socket.to(membersSockets).emit(STOP_TYPING, { chatId });
+    });
+
+    socket.on(CHAT_JOINED, ({ userId, members }) => {
+        onlineUsers.add(userId?.toString());
+
+        const membersSocket = getSockets(members);
+        io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+    });
+
+    socket.on(CHAT_LEAVED, ({ userId, members }) => {
+        onlineUsers.delete(userId?.toString());
+
+        const membersSocket = getSockets(members);
+        io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+    });
+
+
     socket.on("disconnect", () => {
         console.log("user disconnect");
         userSocketIDs.delete(user._id.toString());
+        onlineUsers.delete(user._id.toString());
+        socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
     })
 })
 

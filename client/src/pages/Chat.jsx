@@ -11,13 +11,14 @@ import { grayColor, orange } from "../components/constants/color";
 import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
 import { GetSocket } from "../socket";
-import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE } from "../components/constants/events";
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../components/constants/events";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useInfiniteScrollTop } from "6pp";
 import { useDispatch } from "react-redux";
 import { setIsFileMenu } from "../redux/reducers/misc";
 import { removeNewMessagesAlert } from "../redux/reducers/chat";
+import { TypingLoader } from "../components/layout/Loaders";
 
 // const user = {
 //   avatar: "https://www.w3schools.com/howto/img_avatar.png",
@@ -38,9 +39,9 @@ const Chat = ({ chatId, user }) => {
   const [page, setPage] = useState(1);
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
 
-  // const [IamTyping, setIamTyping] = useState(false);
-  // const [userTyping, setUserTyping] = useState(false);
-  // const typingTimeout = useRef(null);
+  const [IamTyping, setIamTyping] = useState(false);
+  const [userTyping, setUserTyping] = useState(false);
+  const typingTimeout = useRef(null);
 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
 
@@ -63,8 +64,19 @@ const Chat = ({ chatId, user }) => {
 
   const messageOnChange = (e) => {
     setMessage(e.target.value);
-  }
 
+    if (!IamTyping) {
+      socket.emit(START_TYPING, { members, chatId });
+      setIamTyping(true);
+    }
+
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+
+    typingTimeout.current = setTimeout(() => {
+      socket.emit(STOP_TYPING, { members, chatId });
+      setIamTyping(false);
+    }, [2000]);
+  };
 
   const handleFileOpen = (e) => {
     dispatch(setIsFileMenu(true));
@@ -81,6 +93,11 @@ const Chat = ({ chatId, user }) => {
     setMessage("");
 
   }
+
+  useEffect(() => {
+    if (bottomRef.current)
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useEffect(() => {
     socket.emit(CHAT_JOINED, { userId: user?._id, members });
@@ -104,11 +121,28 @@ const Chat = ({ chatId, user }) => {
     [chatId]
   );
 
+  const startTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+
+      setUserTyping(true);
+    },
+    [chatId]
+  );
+
+  const stopTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setUserTyping(false);
+    },
+    [chatId]
+  );
+
   const eventHandler = {
     // [ALERT]: alertListener,
     [NEW_MESSAGE]: newMessagesListener,
-    // [START_TYPING]: startTypingListener,
-    // [STOP_TYPING]: stopTypingListener,
+    [START_TYPING]: startTypingListener,
+    [STOP_TYPING]: stopTypingListener,
   };
 
   useSocketEvents(socket, eventHandler);
@@ -137,7 +171,7 @@ const Chat = ({ chatId, user }) => {
           <MessageComponent key={i._id} message={i} user={user} />
         ))}
 
-        {/* {userTyping && <TypingLoader />} */}
+        {userTyping && <TypingLoader />}
 
         <div ref={bottomRef} />
       </Stack>
