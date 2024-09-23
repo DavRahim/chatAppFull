@@ -11,7 +11,7 @@ import { grayColor, orange } from "../components/constants/color";
 import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
 import { GetSocket } from "../socket";
-import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../components/constants/events";
+import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../components/constants/events";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useInfiniteScrollTop } from "6pp";
@@ -138,8 +138,26 @@ const Chat = ({ chatId, user }) => {
     [chatId]
   );
 
+  const alertListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      const messageForAlert = {
+        content: data.message,
+        sender: {
+          _id: "djasdhajksdhasdsadasdas",
+          name: "Admin",
+        },
+        chat: chatId,
+        createdAt: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, messageForAlert]);
+    },
+    [chatId]
+  );
+
   const eventHandler = {
-    // [ALERT]: alertListener,
+    [ALERT]: alertListener,
     [NEW_MESSAGE]: newMessagesListener,
     [START_TYPING]: startTypingListener,
     [STOP_TYPING]: stopTypingListener,

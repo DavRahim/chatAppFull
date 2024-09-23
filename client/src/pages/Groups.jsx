@@ -16,6 +16,8 @@ import { bgGradient, matBlack } from "../components/constants/color";
 import AvatarCard from "../components/shared/AvatarCard";
 import { Link } from "../components/styles/StyledComponents";
 import { samepleChats, sampleUsers } from "../components/constants/sampleData";
+import { useMyGroupsQuery } from "../redux/api/api";
+import { useErrors } from "../hooks/hook";
 
 const ConfirmDeleteDialog = lazy(() => import("../components/dialogs/ConfirmDeleteDialog"))
 const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog"))
@@ -23,6 +25,9 @@ const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog
 const Groups = () => {
   const chatId = useSearchParams()[0].get("group");
   const navigate = useNavigate();
+
+
+  const myGroups = useMyGroupsQuery("");
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -48,12 +53,23 @@ const Groups = () => {
     console.log(groupNameUpdatedValue);
   }
 
+
+  const errors = [
+    {
+      isError: myGroups.isError,
+      error: myGroups.error,
+    }
+  ];
+
+  useErrors(errors);
+
+
   useEffect(() => {
-    if(chatId) {
+    if (chatId) {
       setGroupName(`Group name ${chatId}`)
       setGroupNameUpdatedValue(`Group name ${chatId}`);
     }
-   
+
 
     return () => {
       setGroupName("")
@@ -73,7 +89,7 @@ const Groups = () => {
     console.log("Add Member");
   }
 
-  const removeMemberHandler =(id) => {
+  const removeMemberHandler = (id) => {
     console.log(id);
   }
 
@@ -189,7 +205,7 @@ const Groups = () => {
   );
 
 
-  return isLoading ? (
+  return myGroups.isLoading ? (
     <LayoutLoader />
   ) : (
     <Grid container height={"100vh"}>
@@ -263,7 +279,7 @@ const Groups = () => {
                       padding: "1rem 2rem",
                       borderRadius: "1rem",
                     }}
-                  handler={removeMemberHandler}
+                    handler={removeMemberHandler}
                   />
                 ))
               )}
