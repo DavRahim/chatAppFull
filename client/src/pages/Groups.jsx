@@ -15,9 +15,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { bgGradient, matBlack } from "../components/constants/color";
 import AvatarCard from "../components/shared/AvatarCard";
 import { Link } from "../components/styles/StyledComponents";
-import { useChatDetailsQuery, useMyGroupsQuery, useRenameGroupMutation } from "../redux/api/api";
+import { useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from "../redux/api/api";
 import { useAsyncMutation, useErrors } from "../hooks/hook";
 import { useDispatch, useSelector } from "react-redux";
+import { setIsAddMember } from "../redux/reducers/misc";
 
 const ConfirmDeleteDialog = lazy(() => import("../components/dialogs/ConfirmDeleteDialog"))
 const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog"))
@@ -38,6 +39,10 @@ const Groups = () => {
 
   const [updateGroup, isLoadingGroupName] = useAsyncMutation(
     useRenameGroupMutation
+  );
+
+  const [removeMember, isLoadingRemoveMember] = useAsyncMutation(
+    useRemoveGroupMemberMutation
   );
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -112,20 +117,17 @@ const Groups = () => {
 
   const openConfirmDeleteHandler = () => {
     setConfirmDeleteDialog(true)
-    console.log("Delete Group");
   };
   const closeConfirmDeleteHandler = () => {
     setConfirmDeleteDialog(false)
   }
   const openAddMemberHandler = () => {
-    console.log("Add Member");
+    dispatch(setIsAddMember(true));
   }
 
-  const removeMemberHandler = (id) => {
-    console.log(id);
-  }
-
-  const isLoadingRemoveMember = false
+  const removeMemberHandler = (userId) => {
+    removeMember("Removing Member...", { chatId, userId });
+  };
 
   const IconBtns = (
     <>
@@ -271,7 +273,7 @@ const Groups = () => {
 
         {groupName && (
           <>
-              {GroupName}
+            {GroupName}
 
             <Typography
               margin={"2rem"}
