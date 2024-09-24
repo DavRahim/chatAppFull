@@ -15,9 +15,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { bgGradient, matBlack } from "../components/constants/color";
 import AvatarCard from "../components/shared/AvatarCard";
 import { Link } from "../components/styles/StyledComponents";
-import { samepleChats, sampleUsers } from "../components/constants/sampleData";
-import { useMyGroupsQuery } from "../redux/api/api";
-import { useErrors } from "../hooks/hook";
+import { useChatDetailsQuery, useMyGroupsQuery, useRenameGroupMutation } from "../redux/api/api";
+import { useAsyncMutation, useErrors } from "../hooks/hook";
+import { useDispatch, useSelector } from "react-redux";
 
 const ConfirmDeleteDialog = lazy(() => import("../components/dialogs/ConfirmDeleteDialog"))
 const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog"))
@@ -25,18 +25,29 @@ const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog
 const Groups = () => {
   const chatId = useSearchParams()[0].get("group");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const { isAddMember } = useSelector((state) => state.misc);
 
   const myGroups = useMyGroupsQuery("");
+
+  const groupDetails = useChatDetailsQuery(
+    { chatId, populate: true },
+    { skip: !chatId }
+  );
+
+  const [updateGroup, isLoadingGroupName] = useAsyncMutation(
+    useRenameGroupMutation
+  );
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
 
-  const [groupName, setGroupName] = useState("group Name");
+  const [groupName, setGroupName] = useState("");
   const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
 
-  const [members, setMembers] = useState(sampleUsers);
+  const [members, setMembers] = useState([]);
 
   const navigateBack = () => {
     navigate('/')
@@ -50,7 +61,10 @@ const Groups = () => {
 
   const updateGroupName = () => {
     setIsEdit(false);
-    console.log(groupNameUpdatedValue);
+    updateGroup("Updating Group Name...", {
+      chatId,
+      name: groupNameUpdatedValue,
+    })
   }
 
 
@@ -58,10 +72,30 @@ const Groups = () => {
     {
       isError: myGroups.isError,
       error: myGroups.error,
+    },
+    {
+      isError: groupDetails.isError,
+      error: groupDetails.error,
     }
   ];
 
   useErrors(errors);
+
+  useEffect(() => {
+    const groupData = groupDetails.data;
+    if (groupData) {
+      setGroupName(groupData.chat.name);
+      setGroupNameUpdatedValue(groupData.chat.name);
+      setMembers(groupData.chat.members);
+    }
+
+    return () => {
+      setGroupName("");
+      setGroupNameUpdatedValue("");
+      setMembers([]);
+      setIsEdit(false);
+    };
+  }, [groupDetails.data]);
 
 
   useEffect(() => {
@@ -69,8 +103,6 @@ const Groups = () => {
       setGroupName(`Group name ${chatId}`)
       setGroupNameUpdatedValue(`Group name ${chatId}`);
     }
-
-
     return () => {
       setGroupName("")
       setGroupNameUpdatedValue("")
@@ -93,9 +125,7 @@ const Groups = () => {
     console.log(id);
   }
 
-  const isLoading = false
   const isLoadingRemoveMember = false
-  const isAddMember = false
 
   const IconBtns = (
     <>
@@ -153,7 +183,7 @@ const Groups = () => {
           />
           <IconButton
             onClick={updateGroupName}
-          // disabled={isLoadingGroupName}
+            disabled={isLoadingGroupName}
           >
             <DoneIcon />
           </IconButton>
@@ -162,7 +192,7 @@ const Groups = () => {
         <>
           <Typography variant="h4">{groupName}</Typography>
           <IconButton
-            // disabled={isLoadingGroupName}
+            disabled={isLoadingGroupName}
             onClick={() => setIsEdit(true)}
           >
             <EditIcon />
@@ -220,8 +250,8 @@ const Groups = () => {
         sm={4}
       >
         <GroupsList
-          // myGroups={myGroups?.data?.groups} 
-          myGroups={samepleChats}
+          myGroups={myGroups?.data?.groups}
+          // myGroups={samepleChats}
           chatId={chatId} />
       </Grid>
 
@@ -241,7 +271,7 @@ const Groups = () => {
 
         {groupName && (
           <>
-            {GroupName}
+              {GroupName}
 
             <Typography
               margin={"2rem"}
@@ -318,8 +348,8 @@ const Groups = () => {
       >
         <GroupsList
           w={"50vw"}
-          // myGroups={myGroups?.data?.groups}
-          myGroups={samepleChats}
+          myGroups={myGroups?.data?.groups}
+          // myGroups={samepleChats}
           chatId={chatId}
         />
       </Drawer>
