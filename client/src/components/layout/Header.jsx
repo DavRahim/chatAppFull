@@ -9,13 +9,13 @@ import {
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom"
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { userNotExists } from "../../redux/reducers/auth";
 import toast from "react-hot-toast";
 import { server } from "../../constants/config";
-import { setIsMobile, setIsNotification, setIsSearch } from "../../redux/reducers/misc";
+import { setIsMobile, setIsNewGroup, setIsNotification, setIsSearch } from "../../redux/reducers/misc";
 
 const SearchDialog = lazy(() => import("../specific/Search"));
 const NotifcationDialog = lazy(() => import("../specific/Notifications"));
@@ -26,20 +26,20 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { isSearch, isNotification } = useSelector(
+  const { isSearch, isNotification, isNewGroup } = useSelector(
     (state) => state.misc
   );
   const { notificationCount } = useSelector((state) => state.chat);
 
   //  const [isSearch, setIsSearch] = useState(false);
-  const [isNewGroup, setIsNewGroup] = useState(false);
+  // const [isNewGroup, setIsNewGroup] = useState(false);
 
 
   const handleMobile = () => dispatch(setIsMobile(true));
   const openSearch = () => dispatch(setIsSearch(true));
   const openNewGroup = () => {
-    setIsNewGroup(prev => !prev)
-  }
+    dispatch(setIsNewGroup(true));
+  };
   const navigateToGroup = () => navigate('/groups');
 
   const openNotification = () => {
