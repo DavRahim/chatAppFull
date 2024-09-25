@@ -15,7 +15,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { bgGradient, matBlack } from "../components/constants/color";
 import AvatarCard from "../components/shared/AvatarCard";
 import { Link } from "../components/styles/StyledComponents";
-import { useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from "../redux/api/api";
+import { useChatDetailsQuery, useDeleteChatMutation, useMyGroupsQuery, useRemoveGroupMemberMutation, useRenameGroupMutation } from "../redux/api/api";
 import { useAsyncMutation, useErrors } from "../hooks/hook";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsAddMember } from "../redux/reducers/misc";
@@ -44,6 +44,11 @@ const Groups = () => {
   const [removeMember, isLoadingRemoveMember] = useAsyncMutation(
     useRemoveGroupMemberMutation
   );
+
+  const [deleteGroup, isLoadingDeleteGroup] = useAsyncMutation(
+    useDeleteChatMutation
+  );
+
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -124,6 +129,12 @@ const Groups = () => {
   const openAddMemberHandler = () => {
     dispatch(setIsAddMember(true));
   }
+
+  const deleteHandler = () => {
+    deleteGroup("Deleting Group...", chatId);
+    closeConfirmDeleteHandler();
+    navigate("/groups");
+  };
 
   const removeMemberHandler = (userId) => {
     removeMember("Removing Member...", { chatId, userId });
@@ -333,7 +344,7 @@ const Groups = () => {
           <ConfirmDeleteDialog
             open={confirmDeleteDialog}
             handleClose={closeConfirmDeleteHandler}
-          // deleteHandler={deleteHandler}
+          deleteHandler={deleteHandler}
           />
         </Suspense>
       )}

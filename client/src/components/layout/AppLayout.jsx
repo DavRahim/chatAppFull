@@ -15,6 +15,7 @@ import { NEW_MESSAGE_ALERT, NEW_REQUEST, ONLINE_USERS, REFETCH_CHATS } from "../
 import { useCallback, useEffect, useRef, useState } from "react";
 import { incrementNotification, setNewMessagesAlert } from "../../redux/reducers/chat";
 import { getOrSaveFromStorage } from "../../lib/features";
+import DeleteChatMenu from "../dialogs/DeleteChatMenu";
 
 const AppLayout = () => (WrappedComponent) => {
     return (props) => {
@@ -83,6 +84,11 @@ const AppLayout = () => (WrappedComponent) => {
             <>
                 <Title />
                 <Header />
+                <DeleteChatMenu
+                    dispatch={dispatch}
+                    deleteMenuAnchor={deleteMenuAnchor}
+                />
+
                 {isLoading ? (
                     <Skeleton />
                 ) : (
