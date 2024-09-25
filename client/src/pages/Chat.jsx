@@ -105,7 +105,7 @@ const Chat = ({ chatId, user }) => {
 
   useEffect(() => {
     if (chatDetails.isError) return navigate("/");
-  }, [chatDetails.isError]);
+  }, [chatDetails.isError, navigate]);
 
   useEffect(() => {
     socket.emit(CHAT_JOINED, { userId: user?._id, members });
