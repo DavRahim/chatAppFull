@@ -31,8 +31,7 @@ const Chat = ({ chatId, user }) => {
   const socket = GetSocket();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-
+  
   const containerRef = useRef(null)
   const bottomRef = useRef(null);
 

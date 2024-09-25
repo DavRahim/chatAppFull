@@ -14,6 +14,9 @@ const MessageComponent = ({ message, user }) => {
 
     const timeAgo = moment(createdAt).fromNow();
 
+    console.log(message, "message");
+    console.log(user, "user");
+
     return (
         <motion.div
             initial={{ opacity: 0, x: "-100%" }}

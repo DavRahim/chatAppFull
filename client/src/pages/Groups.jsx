@@ -344,7 +344,7 @@ const Groups = () => {
           <ConfirmDeleteDialog
             open={confirmDeleteDialog}
             handleClose={closeConfirmDeleteHandler}
-          deleteHandler={deleteHandler}
+            deleteHandler={deleteHandler}
           />
         </Suspense>
       )}

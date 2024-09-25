@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ProtectRoute from './components/auth/ProtectRoute';
@@ -50,7 +51,7 @@ const App = () => {
             </SocketProvider>
           }>
             <Route path="/" element={<Home />} />
-            <Route path="/chat/:chatId" element={<Chat />} />
+            <Route path="/chat/:chatId" element={<Chat user={user} />} />
             <Route path="/groups" element={<Groups />} />
           </Route>
           <Route path="/login" element={
