@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import { setIsFileMenu } from "../redux/reducers/misc";
 import { removeNewMessagesAlert } from "../redux/reducers/chat";
 import { TypingLoader } from "../components/layout/Loaders";
+import { useNavigate } from "react-router-dom";
 
 // const user = {
 //   avatar: "https://www.w3schools.com/howto/img_avatar.png",
@@ -29,6 +30,9 @@ import { TypingLoader } from "../components/layout/Loaders";
 const Chat = ({ chatId, user }) => {
   const socket = GetSocket();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+
   const containerRef = useRef(null)
   const bottomRef = useRef(null);
 
@@ -98,6 +102,10 @@ const Chat = ({ chatId, user }) => {
     if (bottomRef.current)
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (chatDetails.isError) return navigate("/");
+  }, [chatDetails.isError]);
 
   useEffect(() => {
     socket.emit(CHAT_JOINED, { userId: user?._id, members });
