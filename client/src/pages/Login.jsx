@@ -11,7 +11,7 @@ import { server } from "../constants/config";
 import { useDispatch } from "react-redux";
 import { userExists } from "../redux/reducers/auth";
 const Login = () => {
-  
+
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const toggleLogin = () => setIsLogin(!isLogin);
@@ -31,7 +31,7 @@ const Login = () => {
             "Content-Type": "application/json",
         },
     };
-    
+
     const handleLogin = async (e) => {
         e.preventDefault();
         const toastId = toast.loading("Logging In...");
@@ -163,7 +163,7 @@ const Login = () => {
                                     color="primary"
                                     type="submit"
                                     fullWidth
-                                // disabled={isLoading}
+                                    disabled={isLoading}
                                 >
                                     Login
                                 </Button>
@@ -171,7 +171,7 @@ const Login = () => {
                                     OR
                                 </Typography>
                                 <Button
-                                    // disabled={isLoading}
+                                    disabled={isLoading}
                                     fullWidth
                                     variant="text"
                                     onClick={toggleLogin}
@@ -304,7 +304,6 @@ const Login = () => {
                             </form>
                         </>}
                 </Paper>
-
             </Container>
         </div>
     );
