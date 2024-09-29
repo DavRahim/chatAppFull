@@ -11,6 +11,8 @@ import { Box, Drawer, Grid, IconButton, Stack, styled, Typography } from "@mui/m
 import { Link as LinkComponent, Navigate, useLocation } from "react-router-dom";
 import { grayColor, matBlack } from "../constants/color";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { adminLogout } from "../../redux/thunks/admin";
 
 const Link = styled(LinkComponent)`
   text-decoration: none;
@@ -46,10 +48,10 @@ const adminTabs = [
 
 const Sidebar = ({ w = "100%" }) => {
     const location = useLocation();
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
     const logoutHandler = () => {
-        // dispatch(adminLogout());
+        dispatch(adminLogout());
     };
 
     return (
@@ -91,7 +93,8 @@ const Sidebar = ({ w = "100%" }) => {
 };
 
 const AdminLayout = ({ children }) => {
-    const isAdmin = true;
+    const { isAdmin } = useSelector((state) => state.auth);
+
     const [isMobile, setIsMobile] = useState(false);
 
     const handleMobile = () => setIsMobile(!isMobile);
@@ -115,7 +118,7 @@ const AdminLayout = ({ children }) => {
             </Box>
 
             <Grid item md={4} lg={3} sx={{ display: { xs: "none", md: "block" } }}>
-                <Sidebar />  
+                <Sidebar />
             </Grid>
             <Grid
                 item

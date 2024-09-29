@@ -5,6 +5,7 @@ import { User } from "../models/user.js";
 import { Chat } from "../models/chat.js";
 import { Message } from "../models/message.js";
 import { cookieOptions } from "../utils/features.js";
+import { adminSecretKey } from "../app.js";
 
 const adminLogin = TryCatch(async (req, res, next) => {
     const { secretKey } = req.body;
